@@ -91,7 +91,7 @@ const Login = () => {
             placeholder="Enter Email"
             onChange={handleInputChange}
           />
-          {errors.email && <Error message={error.email} />}
+          {errors.email && <Error message={errors.email} />}
         </div>
         <div className="space-y-1">
           <Input
@@ -100,7 +100,7 @@ const Login = () => {
             placeholder="Enter Password"
             onChange={handleInputChange}
           />
-          {errors.password && <Error message={error.password} />}
+          {errors.password && <Error message={errors.password} />}
         </div>
       </CardContent>
       <CardFooter>
