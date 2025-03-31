@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -10,19 +10,64 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { BeatLoader } from "react-spinners";
+import * as Yup from "yup";
 import Error from "./error";
+import useFetch from "@/hooks/use-fetch";
+import { login } from "@/db/apiAuth";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const longLink = searchParams.get("createNew");
+
   const [formState, setFormState] = useState({
     email: "",
     password: "",
   });
-  const [error, setError] = useState([]);
+  const [errors, setErrors] = useState([]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
     setFormState((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const { data, error, loading, fn: fnLogin } = useFetch(login, formState);
+
+  useEffect(() => {
+    console.log(data);
+
+    if (error === null && data) {
+      navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
+    }
+  }, [data, error, longLink, navigate]);
+
+  const handleLogin = async () => {
+    setErrors([]);
+
+    try {
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .email("Invalid Email")
+          .required("Email is Required"),
+        password: Yup.string()
+          .min(6, "Password must be at least 6 characters")
+          .required("Password is Required"),
+      });
+
+      await schema.validate(formState, { abortEarly: false });
+
+      await fnLogin();
+    } catch (error) {
+      const newErrors = {};
+
+      error?.inner?.forEach((err) => {
+        newErrors[err.path] = err.message;
+      });
+
+      setErrors(newErrors);
+    }
   };
 
   return (
@@ -32,7 +77,7 @@ const Login = () => {
         <CardDescription>
           Login to your account if you already have one?
         </CardDescription>
-        <Error message={"some error"} />
+        {error && <Error message={error.message} />}
       </CardHeader>
       <CardContent className={"space-y-2"}>
         <div className="space-y-1">
@@ -42,7 +87,7 @@ const Login = () => {
             placeholder="Enter Email"
             onChange={handleInputChange}
           />
-          <Error message={"some error"} />
+          {errors.email && <Error message={error.email} />}
         </div>
         <div className="space-y-1">
           <Input
@@ -51,12 +96,12 @@ const Login = () => {
             placeholder="Enter Password"
             onChange={handleInputChange}
           />
-          <Error message={"some error"} />
+          {errors.password && <Error message={error.password} />}
         </div>
       </CardContent>
       <CardFooter>
-        <Button>
-          {true ? <BeatLoader size={10} color="#36d7b7" /> : "Login"}
+        <Button onClick={handleLogin}>
+          {loading ? <BeatLoader size={10} color="#36d7b7" /> : "Login"}
         </Button>
       </CardFooter>
     </Card>
