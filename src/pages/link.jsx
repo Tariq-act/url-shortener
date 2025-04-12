@@ -1,3 +1,4 @@
+import DeviceStats from "@/components/device-stats";
 import Location from "@/components/location-stats";
 import { Button } from "@/components/ui/button";
 import {
@@ -145,7 +146,7 @@ const LinkPage = () => {
               <CardTitle>Location Data</CardTitle>
               <Location stats={stats} />
               <CardTitle>Device Info</CardTitle>
-              {/* <DeviceStats stats={stats} /> */}
+              <DeviceStats stats={stats} />
             </CardContent>
           ) : (
             <CardContent>
