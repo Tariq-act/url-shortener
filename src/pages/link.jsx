@@ -1,4 +1,13 @@
+import Location from "@/components/location-stats";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { UrlState } from "@/context";
 import { getClicksForUrl } from "@/db/apiClicks";
 import { deleteUrl, getUrl } from "@/db/apiUrls";
@@ -117,7 +126,35 @@ const LinkPage = () => {
             alt="qr code"
           />
         </div>
-        <div className="sm:w-3/5"></div>
+
+        <Card className="sm:w-3/5">
+          <CardHeader>
+            <CardTitle className={"text-4xl font-extrabold"}> Stats</CardTitle>
+          </CardHeader>
+          {stats && stats.length ? (
+            <CardContent className={"flex flex-col gap-6"}>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Total Clicks</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>{stats?.length}</p>
+                </CardContent>
+              </Card>
+
+              <CardTitle>Location Data</CardTitle>
+              <Location stats={stats} />
+              <CardTitle>Device Info</CardTitle>
+              {/* <DeviceStats stats={stats} /> */}
+            </CardContent>
+          ) : (
+            <CardContent>
+              {loadingStats === false
+                ? "No Statistics yet"
+                : "Loading Statistics..."}
+            </CardContent>
+          )}
+        </Card>
       </div>
     </>
   );
